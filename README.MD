@@ -3,16 +3,15 @@
 
 # 这是什么？
 也许你曾经使用过酷Q，然后用过酷Q的HTTP插件，并使用了一些基于 酷Q HTTP协议插件 的 Java语言 Bot框架，来开发过自己的BOT。（这句话好绕啊...)  
-而HamsterBot，则是另一个版本：并不需要酷Q，也更不需要酷Q的HTTP插件。  
+HamsterBot是另一个版本：并不需要酷Q，也更不需要酷Q的HTTP插件。  
 我们使用的是[IOTQQ](https://github.com/IOTQQ/IOTQQ)。
 
-如果你看到这里，还是没有理解这个项目的意义。  
-请关闭该页面，也许这里不适合你。
+如果看到这里，还没能理解这个项目的意义。那么请关闭该页面，也许这里不适合你。
 
 # 为什么不使用酷Q？
 因为酷Q只能运行在windows环境，而且发图片等功能需要收费（酷Q Pro）。  
-而我想要把我的Bot运行在树莓派上，因此我需要一个高效、跨平台的QQ机器人核心。  
-而[IOTQQ](https://github.com/IOTQQ/IOTQQ)满足了我的所有需求。
+我想要把我的Bot运行在树莓派上，因此我需要一个高效、跨平台的QQ机器人核心。  
+[IOTQQ](https://github.com/IOTQQ/IOTQQ)满足了我的所有需求。
 
 # 我应该如何使用它？
 使用HamsterBot很简单，你只需要clone下来代码，并 `new BotCore("host", port, QQ号).start();`即可。
@@ -76,9 +75,9 @@ public class Main {
 
 **以上三点任何一点未达成，都会导致方法不被调用。**
 
-`@cn.hamster3.bot.listener.EventHandler`注解可以添加参数，设置该事件处理器的优先级、是否忽略取消事件。  
+`@cn.hamster3.bot.listener.EventHandler`注解可以添加参数：设置该事件处理器的优先级、是否忽略取消事件。  
 例子: `@EventHandler(priority = 3, ignoreCancelled = false)`  
-优先级数字越低的事件处理器会被越早于其他处理器执行。  
+优先级数字越低的事件处理器会越早于其他处理器执行。  
 你可以在方法内部调用`event.setCancelled(true);`，这样在你的处理器之后的方法会不处理这个事件。
 除非它的注解上写了`ignoreCancelled = false`。
 
