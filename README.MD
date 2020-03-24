@@ -6,7 +6,7 @@
 HamsterBot是另一个版本：并不需要酷Q，也更不需要酷Q的HTTP插件。  
 我们使用的是[IOTQQ](https://github.com/IOTQQ/IOTQQ)。
 
-如果看到这里，还没能理解这个项目的意义。那么请关闭该页面，也许这里不适合你。
+如果看到这里还没能理解这个项目的意义，那么请关闭该页面，也许这个东西不适合你。
 
 # 为什么不使用酷Q？
 因为酷Q只能运行在windows环境，而且发图片等功能需要收费（酷Q Pro）。  
@@ -60,7 +60,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 public class Main {
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         BotCore core = new BotCore("localhost", 8888, 2644895480L);
         System.out.println(core.addListener(new TestListener()));
         core.start();

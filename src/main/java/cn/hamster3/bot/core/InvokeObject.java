@@ -35,13 +35,4 @@ class InvokeObject {
         return ignoreCancelled;
     }
 
-    @Override
-    public String toString() {
-        return "InvokeObject{" +
-                "object=" + object +
-                ", method=" + method +
-                ", priority=" + priority +
-                ", ignoreCancelled=" + ignoreCancelled +
-                '}';
-    }
 }

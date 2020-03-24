@@ -27,7 +27,7 @@ tasks.withType(JavaCompile) {
 
 jar {
     manifest {
-        attributes 'Main-Class': 'cn.hamster3.bot.Main'
+        attributes 'Main-Class': 'cn.hamster3.bot.preset.Main'
     }
     from {
         configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }

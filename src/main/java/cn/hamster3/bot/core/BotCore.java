@@ -69,6 +69,7 @@ public class BotCore {
     }
 
     public JsonObject sendMessage(JsonObject data) throws IOException {
+        logger.info("发送消息, 内容为: " + data);
         URL url = new URL("http://" + host + ":" + port + "/v1/LuaApiCaller?qq=" + qq + "&funcname=SendMsg&timeout=10");
 
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();

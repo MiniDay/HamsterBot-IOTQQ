@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 
 import java.net.URL;
 
+@SuppressWarnings("unused")
 public class MessageUtils {
     public static JsonObject sendTextToFriend(long qq, String message) {
         return sendTextToFriend(qq, message, null);
@@ -30,10 +31,11 @@ public class MessageUtils {
         JsonObject object = new JsonObject();
         object.addProperty("toUser", groupID);
         object.addProperty("sendToType", 2);
-        object.addProperty("sendMsgType", "sendMsgType");
+        object.addProperty("sendMsgType", "TextMsg");
         object.addProperty("content", message);
         object.addProperty("groupid", 0);
-        object.addProperty("atUser", atUser);
+        object.addProperty("atUser", 0);
+        object.add("replayInfo", null);
         return object;
     }
 
@@ -53,10 +55,42 @@ public class MessageUtils {
         return object;
     }
 
-    public static JsonObject sendImageToFriend(long qq, String message, String base64) {
+    public static JsonObject sendImageToFriend(long groupID, String message, String base64) {
         JsonObject object = new JsonObject();
-        object.addProperty("toUser", qq);
+        object.addProperty("toUser", groupID);
         object.addProperty("sendToType", 1);
+        object.addProperty("sendMsgType", "PicMsg");
+        object.addProperty("content", message);
+        object.addProperty("groupid", 0);
+        object.addProperty("atUser", 0);
+        object.add("replayInfo", JsonNull.INSTANCE);
+
+        object.addProperty("picBase64Buf", base64);
+        object.addProperty("picUrl", "");
+        object.addProperty("fileMd5", "");
+        return object;
+    }
+
+    public static JsonObject sendImageToGroup(long groupID, String message, URL url) {
+        JsonObject object = new JsonObject();
+        object.addProperty("toUser", groupID);
+        object.addProperty("sendToType", 2);
+        object.addProperty("sendMsgType", "PicMsg");
+        object.addProperty("content", message);
+        object.addProperty("groupid", 0);
+        object.addProperty("atUser", 0);
+        object.add("replayInfo", JsonNull.INSTANCE);
+
+        object.addProperty("picBase64Buf", "");
+        object.addProperty("picUrl", url.toString());
+        object.addProperty("fileMd5", "");
+        return object;
+    }
+
+    public static JsonObject sendImageToGroup(long groupID, String message, String base64) {
+        JsonObject object = new JsonObject();
+        object.addProperty("toUser", groupID);
+        object.addProperty("sendToType", 2);
         object.addProperty("sendMsgType", "PicMsg");
         object.addProperty("content", message);
         object.addProperty("groupid", 0);
