@@ -1,0 +1,96 @@
+# 仓鼠BOT
+一个基于[IOTQQ](https://github.com/IOTQQ/IOTQQ)的Java版本QQ机器人框架。
+
+# 这是什么？
+也许你曾经使用过酷Q，然后用过酷Q的HTTP插件，并使用了一些基于 酷Q HTTP协议插件 的 Java语言 Bot框架，来开发过自己的BOT。（这句话好绕啊...)  
+而HamsterBot，则是另一个版本：并不需要酷Q，也更不需要酷Q的HTTP插件。  
+我们使用的是[IOTQQ](https://github.com/IOTQQ/IOTQQ)。
+
+如果你看到这里，还是没有理解这个项目的意义。  
+请关闭该页面，也许这里不适合你。
+
+# 为什么不使用酷Q？
+因为酷Q只能运行在windows环境，而且发图片等功能需要收费（酷Q Pro）。  
+而我想要把我的Bot运行在树莓派上，因此我需要一个高效、跨平台的QQ机器人核心。  
+而[IOTQQ](https://github.com/IOTQQ/IOTQQ)满足了我的所有需求。
+
+# 我应该如何使用它？
+使用HamsterBot很简单，你只需要clone下来代码，并 `new BotCore("host", port, QQ号).start();`即可。
+
+# 我如何让我的代码判断收到消息？
+我的BotCore下有一个方法: `addListener()`, 使用方法参见如下代码：
+监听器代码: 
+```java
+import cn.hamster3.bot.event.Event;
+import cn.hamster3.bot.event.FriendMessageEvent;
+import cn.hamster3.bot.event.SocketConnectedEvent;
+import cn.hamster3.bot.event.SocketRegisteredEvent;
+import cn.hamster3.bot.listener.EventHandler;
+import cn.hamster3.bot.listener.Listener;
+
+public class TestListener implements Listener {
+
+    @EventHandler
+    public void onConnected(SocketConnectedEvent event) {
+        System.out.println("链接成功: " + event.getParams());
+    }
+
+    @EventHandler
+    public void onRegistered(SocketRegisteredEvent event) {
+        System.out.println("注册成功: " + event.getParams());
+    }
+
+    @EventHandler
+    public void onEvent(Event event) {
+        System.out.println("事件: " + event.getParams());
+    }
+
+    @EventHandler
+    public void onFriendMessage(FriendMessageEvent event) {
+
+    }
+}
+```
+
+Main类代码：
+```java
+import cn.hamster3.bot.core.BotCore;
+import cn.hamster3.bot.utils.MessageUtils;
+
+import java.io.IOException;
+import java.net.URISyntaxException;
+
+public class Main {
+    public static void main(String[] args) throws Exception {
+        BotCore core = new BotCore("localhost", 8888, 2644895480L);
+        System.out.println(core.addListener(new TestListener()));
+        core.start();
+    }
+}
+
+```
+需要注意：
+1. 你的监听器类必须`implements cn.hamster3.bot.listener.Listener`  
+2. 事件处理器方法必须写上`@cn.hamster3.bot.listener.EventHandler`注解
+3. 方法的参数只允许有一个，且为`cn.hamster3.bot.event.Event`类本身或它的的子类。
+
+**以上三点任何一点未达成，都会导致方法不被调用。**
+
+`@cn.hamster3.bot.listener.EventHandler`注解可以添加参数，设置该事件处理器的优先级、是否忽略取消事件。  
+例子: `@EventHandler(priority = 3, ignoreCancelled = false)`  
+优先级数字越低的事件处理器会被越早于其他处理器执行。  
+你可以在方法内部调用`event.setCancelled(true);`，这样在你的处理器之后的方法会不处理这个事件。
+除非它的注解上写了`ignoreCancelled = false`。
+
+# 如何让Bot发送消息？
+使用BotCore实例的`sendMessage()`即可。  
+该方法接受一个JsonObject对象作为参数，`MessageUtils` 类应该可以帮助你快速构建发送的消息内容。
+这个方法也
+`System.out.println(core.sendMessage(MessageUtils.sendTextToFriend(767089578, "测试")));`
+
+# 为什么只能发送图片消息？
+ 因为HamsterBot目前还在开发中，自然还有很多IOTQQ的功能未被实现。  
+ 但IOTQQ所有的功能都可以使用http请求来实现，也许你可以试着自己写一些实现类。
+ 
+ # 后言
+ HamsterBot的作者（仓鼠）并不是资深git用户，可能在大多数地方做的并不能让您满意，请多包涵~ 
