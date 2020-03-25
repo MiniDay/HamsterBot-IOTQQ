@@ -21,7 +21,10 @@ public class ScreenListener implements Listener {
     private Robot robot;
     private Rectangle rectangle;
 
+    private boolean enable;
+
     public ScreenListener() throws AWTException {
+        enable = true;
         robot = new Robot();
         rectangle = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
 
@@ -38,6 +41,9 @@ public class ScreenListener implements Listener {
 
     @EventHandler
     public void onFriendMessage(FriendMessageEvent event) throws IOException {
+        if (enable) {
+            return;
+        }
         if (event.getMessageType() != MessageType.TextMsg) {
             return;
         }
@@ -53,6 +59,9 @@ public class ScreenListener implements Listener {
 
     @EventHandler
     public void onGroupMessage(GroupMessageEvent event) throws IOException {
+        if (enable) {
+            return;
+        }
         if (event.getMessageType() != MessageType.TextMsg) {
             return;
         }
@@ -71,15 +80,38 @@ public class ScreenListener implements Listener {
         if (event.getMessageType() != MessageType.TextMsg) {
             return;
         }
-        if (event.getMessage().equalsIgnoreCase("/close screen")) {
-            String message;
-            if (event.getBotCore().removeListener(this)) {
-                message = "关闭成功!";
-            } else {
-                message = "关闭失败!";
-            }
-            event.getBotCore().sendMessage(MessageUtils.sendTextToFriend(event.getSender(), message));
-            event.setCancelled(true);
+        if (event.getSender() != 767089578) {
+            return;
+        }
+        switch (event.getMessage().toLowerCase()) {
+            case "/close screen":
+                enable = false;
+                event.getBotCore().sendMessage(MessageUtils.sendTextToFriend(event.getSender(), "关闭成功!"));
+                break;
+            case "/start screen":
+                enable = true;
+                event.getBotCore().sendMessage(MessageUtils.sendTextToFriend(event.getSender(), "启用成功!"));
+                break;
+        }
+    }
+
+    @EventHandler
+    public void closeMessage(GroupMessageEvent event) throws IOException {
+        if (event.getMessageType() != MessageType.TextMsg) {
+            return;
+        }
+        if (event.getSenderID() != 767089578) {
+            return;
+        }
+        switch (event.getMessage().toLowerCase()) {
+            case "/close screen":
+                enable = false;
+                event.getBotCore().sendMessage(MessageUtils.sendImageToGroup(event.getGroupID(), "", JSListener.getTextImage("关闭成功!")));
+                break;
+            case "/start screen":
+                enable = true;
+                event.getBotCore().sendMessage(MessageUtils.sendImageToGroup(event.getGroupID(), "", JSListener.getTextImage("启用成功!")));
+                break;
         }
     }
 }

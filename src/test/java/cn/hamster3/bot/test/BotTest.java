@@ -1,6 +1,8 @@
 package cn.hamster3.bot.test;
 
 import cn.hamster3.bot.core.BotCore;
+import cn.hamster3.bot.preset.listener.JSListener;
+import cn.hamster3.bot.preset.thread.TimeLimitThread;
 import cn.hamster3.bot.utils.MessageUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,4 +26,28 @@ public class BotTest {
         );
     }
 
+    @Test
+    public void textImage() throws IOException {
+        botCore.sendMessage(
+                MessageUtils.sendImageToFriend(767089578, "", JSListener.getTextImage("test"))
+        );
+    }
+
+    @Test
+    public void timeLimit() {
+        new TimeLimitThread(3000) {
+            @Override
+            public void run() {
+                int i = 0;
+                while (!isFinished()) {
+                    System.out.println(i++);
+                }
+            }
+        }.start();
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 }

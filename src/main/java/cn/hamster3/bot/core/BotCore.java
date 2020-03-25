@@ -84,6 +84,24 @@ public class BotCore {
         return JsonParser.parseReader(new InputStreamReader(connection.getInputStream())).getAsJsonObject();
     }
 
+//    public JsonObject mute(long groupID, long userID, long time) throws IOException {
+//        URL url = new URL("http://" + host + ":" + port + "/v1/LuaApiCaller?qq=" + qq + "&funcname=SendMsg&timeout=10");
+//
+//        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+//        connection.setRequestMethod("POST");
+//        connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+//        connection.setRequestProperty("Charset", "UTF-8");
+//        connection.setRequestProperty("Connection", "Keep-Alive");
+//        connection.setUseCaches(false);
+//
+//        connection.setDoOutput(true);
+//
+//        JsonObject data = new JsonObject();
+//
+//        connection.getOutputStream().write(data.toString().getBytes(StandardCharsets.UTF_8));
+//        return JsonParser.parseReader(new InputStreamReader(connection.getInputStream())).getAsJsonObject();
+//    }
+
     public boolean addListener(Listener listener) {
         return listeners.add(listener);
     }

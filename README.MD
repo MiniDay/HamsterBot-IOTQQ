@@ -6,7 +6,7 @@
 HamsterBot是另一个版本：并不需要酷Q，也更不需要酷Q的HTTP插件。  
 我们使用的是[IOTQQ](https://github.com/IOTQQ/IOTQQ)。
 
-如果看到这里还没能理解这个项目的意义，那么请关闭该页面，也许这个东西不适合你。
+如果看到这里还没能理解这个项目的意义，那么请关闭该页面，我觉得这个东西可能不适合你。
 
 # 为什么不使用酷Q？
 因为酷Q只能运行在windows环境，而且发图片等功能需要收费（酷Q Pro）。  
@@ -16,8 +16,8 @@ HamsterBot是另一个版本：并不需要酷Q，也更不需要酷Q的HTTP插�
 # 我应该如何使用它？
 使用HamsterBot很简单，你只需要clone下来代码，并 `new BotCore("host", port, QQ号).start();`即可。
 
-# 我如何让我的代码判断收到消息？
-我的BotCore下有一个方法: `addListener()`, 使用方法参见如下代码：
+# 我该怎么自定义我的Bot？
+这里有一份示例代码：
 监听器代码: 
 ```java
 import cn.hamster3.bot.event.Event;
@@ -81,15 +81,16 @@ public class Main {
 你可以在方法内部调用`event.setCancelled(true);`，这样在你的处理器之后的方法会不处理这个事件。
 除非它的注解上写了`ignoreCancelled = false`。
 
+更多代码可以参见`cn.hamster3.bot.preset`包
+
 # 如何让Bot发送消息？
 使用BotCore实例的`sendMessage()`即可。  
 该方法接受一个JsonObject对象作为参数，`MessageUtils` 类应该可以帮助你快速构建发送的消息内容。
-这个方法也
 `System.out.println(core.sendMessage(MessageUtils.sendTextToFriend(767089578, "测试")));`
 
-# 为什么只能发送图片消息？
+# 为什么只能发送文字和图片消息？
  因为HamsterBot目前还在开发中，自然还有很多IOTQQ的功能未被实现。  
- 但IOTQQ所有的功能都可以使用http请求来实现，也许你可以试着自己写一些实现类。
+ 但IOTQQ所有的功能都可以使用http请求来实现，也许你可以试着自己写一些实现。
  
  # 后言
  HamsterBot的作者（仓鼠）并不是资深git用户，可能在大多数地方做的并不能让您满意，请多包涵~ 
