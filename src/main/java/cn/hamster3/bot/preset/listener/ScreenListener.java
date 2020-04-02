@@ -22,12 +22,12 @@ public class ScreenListener implements Listener {
     private Rectangle rectangle;
 
     private boolean enable;
+    private long lastScreenTime;
 
     public ScreenListener() throws AWTException {
         enable = true;
         robot = new Robot();
         rectangle = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
-
     }
 
     private String getScreen() throws IOException {
@@ -41,38 +41,50 @@ public class ScreenListener implements Listener {
 
     @EventHandler
     public void onFriendMessage(FriendMessageEvent event) throws IOException {
-        if (enable) {
+        if (!enable) {
             return;
         }
         if (event.getMessageType() != MessageType.TextMsg) {
             return;
         }
-        if (event.getMessage().equalsIgnoreCase("/s")) {
-            event.getBotCore().sendMessage(MessageUtils.sendImageToFriend(
-                    event.getSender(),
-                    "",
-                    getScreen()
-            ));
-            event.setCancelled(true);
+        if (!event.getMessage().equalsIgnoreCase("/s")) {
+            return;
         }
+        long now = System.currentTimeMillis();
+        if (lastScreenTime + 1000 >= now) {
+            return;
+        }
+        lastScreenTime = now;
+        event.getBotCore().sendMessage(MessageUtils.sendImageToFriend(
+                event.getSender(),
+                "",
+                getScreen()
+        ));
+        event.setCancelled(true);
     }
 
     @EventHandler
     public void onGroupMessage(GroupMessageEvent event) throws IOException {
-        if (enable) {
+        if (!enable) {
             return;
         }
         if (event.getMessageType() != MessageType.TextMsg) {
             return;
         }
-        if (event.getMessage().equalsIgnoreCase("/s")) {
-            event.getBotCore().sendMessage(MessageUtils.sendImageToGroup(
-                    event.getGroupID(),
-                    "",
-                    getScreen()
-            ));
-            event.setCancelled(true);
+        if (!event.getMessage().equalsIgnoreCase("/s")) {
+            return;
         }
+        long now = System.currentTimeMillis();
+        if (lastScreenTime + 1000 >= now) {
+            return;
+        }
+        lastScreenTime = now;
+        event.getBotCore().sendMessage(MessageUtils.sendImageToGroup(
+                event.getGroupID(),
+                "",
+                getScreen()
+        ));
+        event.setCancelled(true);
     }
 
     @EventHandler
@@ -80,17 +92,30 @@ public class ScreenListener implements Listener {
         if (event.getMessageType() != MessageType.TextMsg) {
             return;
         }
-        if (event.getSender() != 767089578) {
-            return;
-        }
         switch (event.getMessage().toLowerCase()) {
-            case "/close screen":
+            case "/remove screen":
+                if (event.getSender() != 767089578) {
+                    event.getBotCore().sendMessage(MessageUtils.sendTextToFriend(event.getSender(), "你没有这个权限!"));
+                    return;
+                }
+                if (!enable) {
+                    event.getBotCore().sendMessage(MessageUtils.sendTextToFriend(event.getSender(), "屏幕截图组件已经被移除了!"));
+                    return;
+                }
                 enable = false;
-                event.getBotCore().sendMessage(MessageUtils.sendTextToFriend(event.getSender(), "关闭成功!"));
+                event.getBotCore().sendMessage(MessageUtils.sendTextToFriend(event.getSender(), "屏幕截图组件移除成功!"));
                 break;
-            case "/start screen":
+            case "/add screen":
+                if (event.getSender() != 767089578) {
+                    event.getBotCore().sendMessage(MessageUtils.sendTextToFriend(event.getSender(), "你没有这个权限!"));
+                    return;
+                }
+                if (enable) {
+                    event.getBotCore().sendMessage(MessageUtils.sendTextToFriend(event.getSender(), "屏幕截图组件已经被启用了!"));
+                    return;
+                }
                 enable = true;
-                event.getBotCore().sendMessage(MessageUtils.sendTextToFriend(event.getSender(), "启用成功!"));
+                event.getBotCore().sendMessage(MessageUtils.sendTextToFriend(event.getSender(), "屏幕截图组件添加成功!"));
                 break;
         }
     }
@@ -100,17 +125,30 @@ public class ScreenListener implements Listener {
         if (event.getMessageType() != MessageType.TextMsg) {
             return;
         }
-        if (event.getSenderID() != 767089578) {
-            return;
-        }
         switch (event.getMessage().toLowerCase()) {
-            case "/close screen":
+            case "/remove screen":
+                if (event.getSenderID() != 767089578) {
+                    event.getBotCore().sendMessage(MessageUtils.sendTextToGroup(event.getGroupID(), "你没有这个权限!"));
+                    return;
+                }
+                if (!enable) {
+                    event.getBotCore().sendMessage(MessageUtils.sendTextToGroup(event.getGroupID(), "屏幕截图组件已经被移除了!"));
+                    return;
+                }
                 enable = false;
-                event.getBotCore().sendMessage(MessageUtils.sendImageToGroup(event.getGroupID(), "", JSListener.getTextImage("关闭成功!")));
+                event.getBotCore().sendMessage(MessageUtils.sendTextToGroup(event.getGroupID(), "屏幕截图组件移除成功!"));
                 break;
-            case "/start screen":
+            case "/add screen":
+                if (event.getSenderID() != 767089578) {
+                    event.getBotCore().sendMessage(MessageUtils.sendTextToGroup(event.getGroupID(), "你没有这个权限!"));
+                    return;
+                }
+                if (enable) {
+                    event.getBotCore().sendMessage(MessageUtils.sendTextToGroup(event.getGroupID(), "屏幕截图组件已经被启用了!"));
+                    return;
+                }
                 enable = true;
-                event.getBotCore().sendMessage(MessageUtils.sendImageToGroup(event.getGroupID(), "", JSListener.getTextImage("启用成功!")));
+                event.getBotCore().sendMessage(MessageUtils.sendTextToGroup(event.getGroupID(), "屏幕截图组件添加成功!"));
                 break;
         }
     }

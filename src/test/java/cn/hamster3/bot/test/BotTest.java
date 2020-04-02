@@ -1,7 +1,6 @@
 package cn.hamster3.bot.test;
 
 import cn.hamster3.bot.core.BotCore;
-import cn.hamster3.bot.preset.listener.JSListener;
 import cn.hamster3.bot.preset.thread.TimeLimitThread;
 import cn.hamster3.bot.utils.MessageUtils;
 import org.junit.Before;
@@ -29,7 +28,7 @@ public class BotTest {
     @Test
     public void textImage() throws IOException {
         botCore.sendMessage(
-                MessageUtils.sendImageToFriend(767089578, "", JSListener.getTextImage("test"))
+                MessageUtils.sendTextToGroup(767089578, "test")
         );
     }
 

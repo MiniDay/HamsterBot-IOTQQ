@@ -20,6 +20,14 @@ public class ShutdownListener implements Listener {
         if (!event.getMessage().equalsIgnoreCase("/shutdown")) {
             return;
         }
+        if (event.getSender() != 767089578) {
+            try {
+                event.getBotCore().sendMessage(MessageUtils.sendTextToFriend(event.getSender(), "你没有这个权限!"));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return;
+        }
         logger.warning(String.format("用户 %d 私聊执行关机命令.", event.getSender()));
         try {
             event.getBotCore().sendMessage(
@@ -38,10 +46,18 @@ public class ShutdownListener implements Listener {
         if (!event.getMessage().equalsIgnoreCase("/shutdown")) {
             return;
         }
+        if (event.getSenderID() != 767089578) {
+            try {
+                event.getBotCore().sendMessage(MessageUtils.sendTextToGroup(event.getGroupID(), "你没有这个权限!"));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return;
+        }
         logger.warning(String.format("用户 %d 在群 %d 中执行关机命令.", event.getSenderID(), event.getGroupID()));
         try {
             event.getBotCore().sendMessage(
-                    MessageUtils.sendImageToGroup(event.getGroupID(),"", JSListener.getTextImage( "准备关闭HamsterBot!"))
+                    MessageUtils.sendTextToGroup(event.getGroupID(),"准备关闭HamsterBot!")
             );
         } catch (IOException e) {
             e.printStackTrace();
