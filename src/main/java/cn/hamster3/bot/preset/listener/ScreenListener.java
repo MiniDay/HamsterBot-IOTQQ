@@ -1,11 +1,9 @@
 package cn.hamster3.bot.preset.listener;
 
 import cn.hamster3.bot.data.MessageType;
-import cn.hamster3.bot.event.FriendMessageEvent;
-import cn.hamster3.bot.event.GroupMessageEvent;
+import cn.hamster3.bot.event.MessageEvent;
 import cn.hamster3.bot.listener.EventHandler;
 import cn.hamster3.bot.listener.Listener;
-import cn.hamster3.bot.utils.MessageUtils;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -40,7 +38,7 @@ public class ScreenListener implements Listener {
     }
 
     @EventHandler
-    public void onFriendMessage(FriendMessageEvent event) throws IOException {
+    public void onScreenRequire(MessageEvent event) throws IOException {
         if (!enable) {
             return;
         }
@@ -55,100 +53,39 @@ public class ScreenListener implements Listener {
             return;
         }
         lastScreenTime = now;
-        event.getBotCore().sendMessage(MessageUtils.sendImageToFriend(
-                event.getSender(),
-                "",
-                getScreen()
-        ));
+        event.replyIgnoreException("", getScreen());
         event.setCancelled(true);
     }
 
     @EventHandler
-    public void onGroupMessage(GroupMessageEvent event) throws IOException {
-        if (!enable) {
-            return;
-        }
-        if (event.getMessageType() != MessageType.TextMsg) {
-            return;
-        }
-        if (!event.getMessage().equalsIgnoreCase("/s")) {
-            return;
-        }
-        long now = System.currentTimeMillis();
-        if (lastScreenTime + 1000 >= now) {
-            return;
-        }
-        lastScreenTime = now;
-        event.getBotCore().sendMessage(MessageUtils.sendImageToGroup(
-                event.getGroupID(),
-                "",
-                getScreen()
-        ));
-        event.setCancelled(true);
-    }
-
-    @EventHandler
-    public void closeMessage(FriendMessageEvent event) throws IOException {
+    public void closeMessage(MessageEvent event) {
         if (event.getMessageType() != MessageType.TextMsg) {
             return;
         }
         switch (event.getMessage().toLowerCase()) {
             case "/remove screen":
                 if (event.getSender() != 767089578) {
-                    event.getBotCore().sendMessage(MessageUtils.sendTextToFriend(event.getSender(), "你没有这个权限!"));
+                    event.replyIgnoreException("你没有这个权限!");
                     return;
                 }
                 if (!enable) {
-                    event.getBotCore().sendMessage(MessageUtils.sendTextToFriend(event.getSender(), "屏幕截图组件已经被移除了!"));
+                    event.replyIgnoreException("屏幕截图组件已经被移除了!");
                     return;
                 }
                 enable = false;
-                event.getBotCore().sendMessage(MessageUtils.sendTextToFriend(event.getSender(), "屏幕截图组件移除成功!"));
+                event.replyIgnoreException("屏幕截图组件移除成功!");
                 break;
             case "/add screen":
                 if (event.getSender() != 767089578) {
-                    event.getBotCore().sendMessage(MessageUtils.sendTextToFriend(event.getSender(), "你没有这个权限!"));
+                    event.replyIgnoreException("你没有这个权限!");
                     return;
                 }
                 if (enable) {
-                    event.getBotCore().sendMessage(MessageUtils.sendTextToFriend(event.getSender(), "屏幕截图组件已经被启用了!"));
+                    event.replyIgnoreException("屏幕截图组件已经被启用了!");
                     return;
                 }
                 enable = true;
-                event.getBotCore().sendMessage(MessageUtils.sendTextToFriend(event.getSender(), "屏幕截图组件添加成功!"));
-                break;
-        }
-    }
-
-    @EventHandler
-    public void closeMessage(GroupMessageEvent event) throws IOException {
-        if (event.getMessageType() != MessageType.TextMsg) {
-            return;
-        }
-        switch (event.getMessage().toLowerCase()) {
-            case "/remove screen":
-                if (event.getSenderID() != 767089578) {
-                    event.getBotCore().sendMessage(MessageUtils.sendTextToGroup(event.getGroupID(), "你没有这个权限!"));
-                    return;
-                }
-                if (!enable) {
-                    event.getBotCore().sendMessage(MessageUtils.sendTextToGroup(event.getGroupID(), "屏幕截图组件已经被移除了!"));
-                    return;
-                }
-                enable = false;
-                event.getBotCore().sendMessage(MessageUtils.sendTextToGroup(event.getGroupID(), "屏幕截图组件移除成功!"));
-                break;
-            case "/add screen":
-                if (event.getSenderID() != 767089578) {
-                    event.getBotCore().sendMessage(MessageUtils.sendTextToGroup(event.getGroupID(), "你没有这个权限!"));
-                    return;
-                }
-                if (enable) {
-                    event.getBotCore().sendMessage(MessageUtils.sendTextToGroup(event.getGroupID(), "屏幕截图组件已经被启用了!"));
-                    return;
-                }
-                enable = true;
-                event.getBotCore().sendMessage(MessageUtils.sendTextToGroup(event.getGroupID(), "屏幕截图组件添加成功!"));
+                event.replyIgnoreException("屏幕截图组件添加成功!");
                 break;
         }
     }

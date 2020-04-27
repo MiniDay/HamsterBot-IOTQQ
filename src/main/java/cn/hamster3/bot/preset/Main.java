@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 public class Main {
-    public static void main(String[] args) throws URISyntaxException {
+    public static void main(String[] args) throws URISyntaxException, InterruptedException {
         BotCore core = new BotCore("localhost", 8888, 2644895480L);
 
         try {
@@ -26,6 +26,9 @@ public class Main {
             core.sendMessage(MessageUtils.sendTextToGroup(612955360, "仓鼠Bot已启动!"));
         } catch (IOException e) {
             e.printStackTrace();
+            System.out.println("启动消息发送失败, Bot已关闭...");
+            Thread.sleep(3000);
+            System.exit(0);
         }
     }
 }

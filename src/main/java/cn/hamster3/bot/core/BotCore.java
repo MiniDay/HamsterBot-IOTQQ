@@ -69,6 +69,13 @@ public class BotCore {
 
     }
 
+    /**
+     * 发送一条消息
+     *
+     * @param data 消息内容，一般情况下请使用@{MessageUtils}
+     * @return 发送后返回的信息（是否发送成功之类的
+     * @throws IOException 消息发送失败时的异常
+     */
     public JsonObject sendMessage(JsonObject data) throws IOException {
         logger.info("发送消息, 内容为: " + data);
         URL url = new URL("http://" + host + ":" + port + "/v1/LuaApiCaller?qq=" + qq + "&funcname=SendMsg&timeout=10");
@@ -83,6 +90,21 @@ public class BotCore {
         connection.setDoOutput(true);
         connection.getOutputStream().write(data.toString().getBytes(StandardCharsets.UTF_8));
         return JsonParser.parseReader(new InputStreamReader(connection.getInputStream())).getAsJsonObject();
+    }
+
+    /**
+     * 发送一条消息，忽略异常抛出
+     *
+     * @param data 要发送的数据
+     * @return 发送后返回的信息（是否发送成功之类的
+     */
+    public JsonObject sendMessageIgnoreException(JsonObject data) {
+        try {
+            return sendMessage(data);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
 //    public JsonObject mute(long groupID, long userID, long time) throws IOException {
@@ -134,7 +156,7 @@ public class BotCore {
         invokeObjects.sort(Comparator.comparingInt(InvokeObject::getPriority));
 
         for (InvokeObject object : invokeObjects) {
-            if (event.isCancelled() && !object.isIgnoreCancelled()) {
+            if (event.isCancelled() && object.isIgnoreCancelled()) {
                 continue;
             }
             object.invoke(event);

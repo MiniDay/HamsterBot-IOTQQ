@@ -2,22 +2,20 @@ package cn.hamster3.bot.event;
 
 import cn.hamster3.bot.core.BotCore;
 import cn.hamster3.bot.data.MessageType;
+import cn.hamster3.bot.utils.MessageUtils;
 import com.google.gson.JsonObject;
 
-public class GroupMessageEvent extends Event {
+import java.io.IOException;
+
+public class GroupMessageEvent extends MessageEvent {
     // 群号
     private long groupID;
     // 群名称
     private String groupNickName;
-    // 发送者ID
-    private long senderID;
+
     // 发送者群名片
     private String senderNickName;
 
-    // 消息类型
-    private MessageType messageType;
-    // 消息文本内容
-    private String message;
     // 消息顺序号
     private long messageSequence;
     // 消息发送时间
@@ -43,7 +41,20 @@ public class GroupMessageEvent extends Event {
             messageTime = data.get("MsgTime").getAsLong();
             messageSequence = data.get("MsgSeq").getAsLong();
         }
+    }
 
+    @Override
+    public JsonObject reply(String message) throws IOException {
+        return getBotCore().sendMessage(
+                MessageUtils.sendTextToGroup(groupID, message)
+        );
+    }
+
+    @Override
+    public JsonObject reply(String message, String image) throws IOException {
+        return getBotCore().sendMessage(
+                MessageUtils.sendImageToGroup(groupID, message, image)
+        );
     }
 
     public long getGroupID() {
@@ -52,10 +63,6 @@ public class GroupMessageEvent extends Event {
 
     public String getGroupNickName() {
         return groupNickName;
-    }
-
-    public long getSenderID() {
-        return senderID;
     }
 
     public String getSenderNickName() {

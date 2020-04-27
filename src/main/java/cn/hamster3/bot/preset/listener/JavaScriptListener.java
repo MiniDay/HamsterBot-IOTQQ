@@ -10,7 +10,6 @@ import cn.hamster3.bot.utils.MessageUtils;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
-import java.io.IOException;
 import java.util.logging.Logger;
 
 public class JavaScriptListener implements Listener {
@@ -47,17 +46,13 @@ public class JavaScriptListener implements Listener {
             forbidCode = "Runtime";
         }
         if (forbidCode != null) {
-            logger.warning(String.format("用户 %d 在群 %d 中执行危险JS代码: %s", event.getSenderID(), event.getGroupID(), code));
-            try {
-                event.getBotCore().sendMessage(
-                        MessageUtils.sendTextToGroup(event.getGroupID(), "禁止使用危险代码: " + forbidCode)
-                );
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            logger.warning(String.format("用户 %d 在群 %d 中执行危险JavaScript代码: %s", event.getSender(), event.getGroupID(), code));
+            event.getBotCore().sendMessageIgnoreException(
+                    MessageUtils.sendTextToGroup(event.getGroupID(), "禁止使用危险代码: " + forbidCode)
+            );
             return;
         }
-        logger.info(String.format("用户 %d 在群 %d 中执行JS代码: %s", event.getSenderID(), event.getGroupID(), code));
+        logger.info(String.format("用户 %d 在群 %d 中执行JavaScript代码: %s", event.getSender(), event.getGroupID(), code));
 
         new TimeLimitThread(3000) {
             @Override
@@ -65,36 +60,27 @@ public class JavaScriptListener implements Listener {
                 try {
                     Object result = engine.eval(code);
                     if (result == null) {
-                        result = "JS执行完成: 无输出";
+                        result = "JavaScript代码执行完成: 无输出";
                     } else {
-                        result = "JS执行完成, 输出: \n" + result;
+                        result = "JavaScript代码执行完成, 输出: \n" + result;
                     }
-                    try {
-                        event.getBotCore().sendMessage(
-                                MessageUtils.sendTextToGroup(event.getGroupID(), result.toString())
-                        );
-                    } catch (IOException ignored) {
-                    }
+                    event.getBotCore().sendMessageIgnoreException(
+                            MessageUtils.sendTextToGroup(event.getGroupID(), result.toString())
+                    );
                 } catch (ScriptException e) {
-                    logger.warning(String.format("用户 %d 在群 %d 中执行JS代码 %s 时出错: %s", event.getSenderID(), event.getGroupID(), code, e.getMessage()));
-                    try {
-                        event.getBotCore().sendMessage(
-                                MessageUtils.sendTextToGroup(event.getGroupID(), "JS代码执行异常: \n" + e.toString())
-                        );
-                    } catch (IOException ignored) {
-                    }
+                    logger.warning(String.format("用户 %d 在群 %d 中执行JavaScript代码 %s 时出错: %s", event.getSender(), event.getGroupID(), code, e.getMessage()));
+                    event.getBotCore().sendMessageIgnoreException(
+                            MessageUtils.sendTextToGroup(event.getGroupID(), "JavaScript代码执行异常: \n" + e.toString())
+                    );
                 }
                 setFinished(true);
             }
 
             @Override
             public void timeout() {
-                try {
-                    event.getBotCore().sendMessage(
-                            MessageUtils.sendTextToGroup(event.getGroupID(), "JS代码执行超时!")
-                    );
-                } catch (IOException ignored) {
-                }
+                event.getBotCore().sendMessageIgnoreException(
+                        MessageUtils.sendTextToGroup(event.getGroupID(), "JavaScript代码执行超时!")
+                );
             }
         }.start();
     }
