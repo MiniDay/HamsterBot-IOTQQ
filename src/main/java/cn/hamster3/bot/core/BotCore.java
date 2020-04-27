@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.logging.Logger;
 
+@SuppressWarnings("unused")
 public class BotCore {
     private static Logger logger = Logger.getLogger("BOT");
 

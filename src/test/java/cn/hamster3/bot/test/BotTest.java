@@ -3,6 +3,7 @@ package cn.hamster3.bot.test;
 import cn.hamster3.bot.core.BotCore;
 import cn.hamster3.bot.preset.thread.TimeLimitThread;
 import cn.hamster3.bot.utils.MessageUtils;
+import com.google.gson.JsonObject;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -20,16 +21,18 @@ public class BotTest {
 
     @Test
     public void sendGroupMessage() throws IOException {
-        botCore.sendMessage(
+        JsonObject object = botCore.sendMessage(
                 MessageUtils.sendImageToGroup(612955360, "", new URL("https://www.hamster3.cn/images/bg3.jpg"))
         );
+        System.out.println(object.toString());
     }
 
     @Test
     public void textImage() throws IOException {
-        botCore.sendMessage(
+        JsonObject object = botCore.sendMessage(
                 MessageUtils.sendTextToGroup(767089578, "test")
         );
+        System.out.println(object.toString());
     }
 
     @Test
