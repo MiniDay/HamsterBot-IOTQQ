@@ -91,7 +91,23 @@ public class BotCore {
         connection.getOutputStream().write(data.toString().getBytes(StandardCharsets.UTF_8));
         return JsonParser.parseReader(new InputStreamReader(connection.getInputStream())).getAsJsonObject();
     }
+    /**
+     * 刷新Keys。
+     *
+     * @param qq 当前QQ号。
+     * @return IOT返回信息。
+     * */
+    public JsonObject refreshKeys(long qq) throws IOException{
+        URL url = new URL("http://" + host + ":" + port + "/v1/RefreshKeys?qq=" + qq);
 
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+        connection.setRequestProperty("Charset", "UTF-8");
+        connection.setRequestProperty("Connection", "Keep-Alive");
+        connection.setUseCaches(false);
+
+        return JsonParser.parseReader(new InputStreamReader(connection.getInputStream())).getAsJsonObject();
+    }
     /**
      * 发送一条消息，忽略异常抛出
      *
