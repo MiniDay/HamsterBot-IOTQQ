@@ -4,12 +4,12 @@ import cn.hamster3.bot.core.BotCore;
 import cn.hamster3.bot.data.MessageType;
 import cn.hamster3.bot.data.Picture;
 import cn.hamster3.bot.utils.MessageUtils;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.google.gson.JsonParser;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 public class GroupMessageEvent extends MessageEvent {
     // 群号(所有消息类型均有)
@@ -42,83 +42,78 @@ public class GroupMessageEvent extends MessageEvent {
         JsonObject currentPacket = object.getAsJsonObject("CurrentPacket");
         JsonObject data = currentPacket.getAsJsonObject("Data");
 
-        if("TextMsg".equalsIgnoreCase(data.get("MsgType").getAsString())
-        ||"AtMsg".equalsIgnoreCase(data.get("MsgType").getAsString())
-        ||"PicMsg".equalsIgnoreCase(data.get("MsgType").getAsString())
-        ||"BigFaceMsg".equalsIgnoreCase(data.get("MsgType").getAsString())) {
+        try {
             messageType = MessageType.valueOf(data.get("MsgType").getAsString());
-            groupNickName = data.get("FromGroupName").getAsString();
-            senderNickName = data.get("FromNickName").getAsString();
-
-            messageRandom = data.get("MsgRandom").getAsLong();
-            groupID = data.get("FromGroupId").getAsLong();
-            senderID = data.get("FromUserId").getAsLong();
-            messageTime = data.get("MsgTime").getAsLong();
-            messageSequence = data.get("MsgSeq").getAsLong();
+        } catch (IllegalArgumentException e) {
+            messageType = MessageType.UnknownMsg;
+            message = "[此消息类型暂不支持解析]";
         }
 
-        if ("TextMsg".equalsIgnoreCase(data.get("MsgType").getAsString())) {
-            message = data.get("Content").getAsString();
-        }else if("AtMsg".equalsIgnoreCase(data.get("MsgType").getAsString())){
-            try {
-                JSONObject content = new JSONObject(data.get("Content").getAsString());
-                message=content.getString("Content");
-                tips=content.getString("Tips");
-                JSONArray userArray=content.getJSONArray("UserID");
-                atUsers=new long[userArray.length()];
-                for(int i=0;i<userArray.length();i++)
-                    atUsers[i]=userArray.getLong(i);
-            }catch (JSONException e){
-                System.err.println("AtMsg解析失败，详细信息:");
-                e.printStackTrace();
+        groupNickName = data.get("FromGroupName").getAsString();
+        senderNickName = data.get("FromNickName").getAsString();
+
+        messageRandom = data.get("MsgRandom").getAsLong();
+        groupID = data.get("FromGroupId").getAsLong();
+        senderID = data.get("FromUserId").getAsLong();
+        messageTime = data.get("MsgTime").getAsLong();
+        messageSequence = data.get("MsgSeq").getAsLong();
+
+        switch (messageType) {
+            case TextMsg: {
+                message = data.get("Content").getAsString();
+                break;
             }
-        }else if("PicMsg".equalsIgnoreCase(data.get("MsgType").getAsString())){
-            try{
-                JSONObject content=new JSONObject(data.get("Content").getAsString());
-                if(content.has("Content"))message=content.getString("Content");
-                else message="";
-                JSONArray pics=content.getJSONArray("GroupPic");
-                pictures=new Picture[pics.length()];
-                tips=content.getString("Tips");
-                for(int i=0;i<pics.length();i++){
-                    Picture temp=new Picture();
-                    JSONObject tempObject=pics.getJSONObject(i);
-                    temp.fileID=tempObject.getLong("FileId");
-                    temp.fileMD5=tempObject.getString("FileMd5");
-                    temp.fileSize=tempObject.getInt("FileSize");
-                    temp.forwordBuf=tempObject.getString("ForwordBuf");
-                    temp.url=tempObject.getString("Url");
-                    temp.forwordField=tempObject.getString("ForwordField");
-                    pictures[i]=temp;
+            case AtMsg: {
+                JsonObject content = JsonParser.parseString(data.get("Content").getAsString()).getAsJsonObject();
+                message = content.get("Content").getAsString();
+                tips = content.get("Tips").getAsString();
+                JsonArray userArray = content.getAsJsonArray("UserID");
+                atUsers = new long[userArray.size()];
+                for (int i = 0; i < userArray.size(); i++) {
+                    atUsers[i] = userArray.get(i).getAsLong();
                 }
-            }catch(JSONException e){
-                System.err.println("PicMsg解析失败，详细信息:");
-                e.printStackTrace();
+                break;
             }
-        }else if("BigFaceMsg".equalsIgnoreCase(data.get("MsgType").getAsString())){
-            try{
-                JSONObject content=new JSONObject(data.get("Content").getAsString());
-                message=content.getString("Content");
-                bigFace=new Picture();
-                bigFace.forwordBuf=content.getString("ForwordBuf");
-                bigFace.forwordField=content.getString("ForwordField");
-            }catch (JSONException e){
-                System.err.println("BigFaceMsg解析失败，详细信息:");
-                e.printStackTrace();
+            case PicMsg: {
+                JsonObject content = JsonParser.parseString(data.get("Content").getAsString()).getAsJsonObject();
+                if (content.has("Content")) {
+                    message = content.get("Content").getAsString();
+                } else {
+                    message = "";
+                }
+                tips = content.get("Tips").getAsString();
+                JsonArray pics = content.getAsJsonArray("GroupPic");
+                pictures = new Picture[pics.size()];
+                for (int i = 0; i < pics.size(); i++) {
+                    JsonObject pic = pics.get(i).getAsJsonObject();
+                    Picture temp = new Picture(
+                            pic.get("Url").getAsString(),
+                            pic.get("FileId").getAsLong(),
+                            pic.get("FileSize").getAsInt(),
+                            pic.get("FileMd5").getAsString(),
+                            pic.get("ForwordBuf").getAsString(),
+                            pic.get("ForwordField").getAsString()
+                    );
+                    pictures[i] = temp;
+                }
+                break;
             }
-        }else if("VoiceMsg".equalsIgnoreCase(data.get("MsgType").getAsString())){
-            try{
-                JSONObject content=new JSONObject(data.get("Content").getAsString());
-                message=content.getString("Tips");
-                tips=content.getString("Tips");
-                voiceUrl=content.getString("Url");
-            }catch(JSONException e){
-                System.err.println("VoiceMsg解析失败，详细信息:");
-                e.printStackTrace();
+            case BigFaceMsg: {
+                JsonObject content = JsonParser.parseString(data.get("Content").getAsString()).getAsJsonObject();
+                message = content.get("Content").getAsString();
+                bigFace = new Picture(
+                        content.get("ForwordBuf").getAsString(),
+                        content.get("ForwordField").getAsString()
+                );
+                break;
             }
-        }else{
-            messageType=MessageType.valueOf("UnknownMsg");
-            message="[此消息类型暂不支持解析]";
+            case VoiceMsg: {
+                JsonObject content = JsonParser.parseString(data.get("Content").getAsString()).getAsJsonObject();
+                message = content.get("message").getAsString();
+                tips = content.get("Tips").getAsString();
+                voiceUrl = content.get("Url").getAsString();
+                break;
+            }
         }
     }
 
@@ -167,20 +162,44 @@ public class GroupMessageEvent extends MessageEvent {
     public long getMessageRandom() {
         return messageRandom;
     }
+
     public long[] getAtUsers() {
         return atUsers;
     }
+
     public Picture[] getPictures() {
         return pictures;
     }
+
     public String getTips() {
         return tips;
     }
+
     public Picture getBigFace() {
         return bigFace;
     }
+
     public String getVoiceUrl() {
         return voiceUrl;
     }
 
+    @Override
+    public String toString() {
+        return "GroupMessageEvent{" +
+                "groupID=" + groupID +
+                ", groupNickName='" + groupNickName + '\'' +
+                ", senderNickName='" + senderNickName + '\'' +
+                ", messageSequence=" + messageSequence +
+                ", messageTime=" + messageTime +
+                ", messageRandom=" + messageRandom +
+                ", atUsers=" + Arrays.toString(atUsers) +
+                ", pictures=" + Arrays.toString(pictures) +
+                ", tips='" + tips + '\'' +
+                ", bigFace=" + bigFace +
+                ", voiceUrl='" + voiceUrl + '\'' +
+                ", senderID=" + senderID +
+                ", message='" + message + '\'' +
+                ", messageType=" + messageType +
+                '}';
+    }
 }

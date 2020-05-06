@@ -19,6 +19,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.logging.Logger;
 
@@ -58,15 +59,17 @@ public class BotCore {
                 socket.off("connect", this);
             }
         });
-        socket.on("OnFriendMsgs", args -> callEvent(new FriendMessageEvent(this, JsonParser.parseString(args[0].toString()).getAsJsonObject())));
+        socket.on("OnFriendMsgs", args -> {
+            System.out.println(Arrays.toString(args));
+            callEvent(new FriendMessageEvent(this, JsonParser.parseString(args[0].toString()).getAsJsonObject()));
+        });
         socket.on("OnGroupMsgs", args -> callEvent(new GroupMessageEvent(this, JsonParser.parseString(args[0].toString()).getAsJsonObject())));
         socket.on("OnEvents", args -> callEvent(new OtherEvent(this, JsonParser.parseString(args[0].toString()).getAsJsonObject())));
     }
 
     public void start() {
         socket.connect();
-        logger.info("正在连接至IOTQQ...");
-
+        logger.info("正在连接至IOTBot...");
     }
 
     /**
@@ -77,7 +80,6 @@ public class BotCore {
      * @throws IOException 消息发送失败时的异常
      */
     public JsonObject sendMessage(JsonObject data) throws IOException {
-        logger.info("发送消息, 内容为: " + data);
         URL url = new URL("http://" + host + ":" + port + "/v1/LuaApiCaller?qq=" + qq + "&funcname=SendMsg&timeout=10");
 
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -91,23 +93,7 @@ public class BotCore {
         connection.getOutputStream().write(data.toString().getBytes(StandardCharsets.UTF_8));
         return JsonParser.parseReader(new InputStreamReader(connection.getInputStream())).getAsJsonObject();
     }
-    /**
-     * 刷新Keys。
-     *
-     * @param qq 当前QQ号。
-     * @return IOT返回信息。
-     * */
-    public JsonObject refreshKeys(long qq) throws IOException{
-        URL url = new URL("http://" + host + ":" + port + "/v1/RefreshKeys?qq=" + qq);
 
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("GET");
-        connection.setRequestProperty("Charset", "UTF-8");
-        connection.setRequestProperty("Connection", "Keep-Alive");
-        connection.setUseCaches(false);
-
-        return JsonParser.parseReader(new InputStreamReader(connection.getInputStream())).getAsJsonObject();
-    }
     /**
      * 发送一条消息，忽略异常抛出
      *
@@ -121,6 +107,24 @@ public class BotCore {
             e.printStackTrace();
             return null;
         }
+    }
+
+    /**
+     * 刷新Keys。
+     *
+     * @param qq 当前QQ号
+     * @return IOT返回信息
+     */
+    public JsonObject refreshKeys(long qq) throws IOException {
+        URL url = new URL("http://" + host + ":" + port + "/v1/RefreshKeys?qq=" + qq);
+
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+        connection.setRequestProperty("Charset", "UTF-8");
+        connection.setRequestProperty("Connection", "Keep-Alive");
+        connection.setUseCaches(false);
+
+        return JsonParser.parseReader(new InputStreamReader(connection.getInputStream())).getAsJsonObject();
     }
 
 //    public JsonObject mute(long groupID, long userID, long time) throws IOException {

@@ -51,4 +51,13 @@ public abstract class MessageEvent extends Event {
     public MessageType getMessageType() {
         return messageType;
     }
+
+    @Override
+    public String toString() {
+        return "MessageEvent{" +
+                "senderID=" + senderID +
+                ", message='" + message + '\'' +
+                ", messageType=" + messageType +
+                '}';
+    }
 }

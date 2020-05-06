@@ -22,9 +22,14 @@ public class ScreenListener implements Listener {
     private boolean enable;
     private long lastScreenTime;
 
-    public ScreenListener() throws AWTException {
+    public ScreenListener() {
         enable = true;
-        robot = new Robot();
+        try {
+            robot = new Robot();
+        } catch (AWTException e) {
+            e.printStackTrace();
+            enable = false;
+        }
         rectangle = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
     }
 
@@ -78,6 +83,10 @@ public class ScreenListener implements Listener {
             case "/add screen":
                 if (event.getSender() != 767089578) {
                     event.replyIgnoreException("你没有这个权限!");
+                    return;
+                }
+                if (robot == null) {
+                    event.replyIgnoreException("运行BOT的计算机不支持屏幕截图组件!");
                     return;
                 }
                 if (enable) {

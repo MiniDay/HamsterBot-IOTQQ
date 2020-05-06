@@ -5,8 +5,7 @@ import cn.hamster3.bot.data.MessageType;
 import cn.hamster3.bot.data.Picture;
 import cn.hamster3.bot.utils.MessageUtils;
 import com.google.gson.JsonObject;
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.google.gson.JsonParser;
 
 import java.io.IOException;
 
@@ -27,47 +26,47 @@ public class FriendMessageEvent extends MessageEvent {
         JsonObject currentPacket = object.getAsJsonObject("CurrentPacket");
         JsonObject data = currentPacket.getAsJsonObject("Data");
 
-        if("TextMsg".equalsIgnoreCase(data.get("MsgType").getAsString())
-        ||"PicMsg".equalsIgnoreCase(data.get("MsgType").getAsString())
-        ||"BigFaceMsg".equalsIgnoreCase(data.get("MsgType").getAsString())){
+        try {
             messageType = MessageType.valueOf(data.get("MsgType").getAsString());
-            senderID = data.get("FromUin").getAsLong();
-            messageSequence = data.get("MsgSeq").getAsLong();
-            toUser = data.get("ToUin").getAsLong();
+        } catch (IllegalArgumentException e) {
+            messageType = MessageType.UnknownMsg;
+            message = "[此消息类型暂不支持解析]";
         }
 
-        if ("TextMsg".equalsIgnoreCase(data.get("MsgType").getAsString())) {
-            message = data.get("Content").getAsString();
-        }else if("PicMsg".equalsIgnoreCase(data.get("MsgType").getAsString())){
-            try{
-                JSONObject content=new JSONObject(data.get("Content").getAsString());
-                message=content.getString("Content");
-                tips=content.getString("Tips");
-                picture=new Picture();
-                picture.url=content.getString("Url");
-                picture.fileMD5=content.getString("FileMd5");
-                picture.path=content.getString("Path");
-                picture.fileSize=content.getInt("FileSize");
-            }catch(JSONException e){
-                System.err.println("PicMsg解析失败，详细信息:");
-                e.printStackTrace();
+        senderID = data.get("FromUin").getAsLong();
+        messageSequence = data.get("MsgSeq").getAsLong();
+        toUser = data.get("ToUin").getAsLong();
+
+        switch (messageType) {
+            case TextMsg: {
+                message = data.get("Content").getAsString();
+                break;
             }
-        }else if("BigFaceMsg".equalsIgnoreCase(data.get("MsgType").getAsString())){
-            try{
-                JSONObject content=new JSONObject(data.get("Content").getAsString());
-                message=content.getString("Content");
-                tips=content.getString("Tips");
-                picture=new Picture();
-                picture.forwordBuf=content.getString("ForwordBuf");
-                picture.forwordField=content.getString("ForwordField");
-            }catch(JSONException e){
-                System.err.println("PicMsg解析失败，详细信息:");
-                e.printStackTrace();
+            case PicMsg: {
+                JsonObject content = JsonParser.parseString(data.get("Content").getAsString()).getAsJsonObject();
+                message = content.get("Content").getAsString();
+                tips = content.get("Tips").getAsString();
+                picture = new Picture(
+                        content.get("Path").getAsString(),
+                        content.get("Url").getAsString(),
+                        content.get("FileSize").getAsInt(),
+                        content.get("FileMd5").getAsString()
+
+                );
+                break;
             }
-        }else{
-            messageType=MessageType.valueOf("UnknownMsg");
-            message="[此消息类型暂不支持解析]";
+            case BigFaceMsg: {
+                JsonObject content = JsonParser.parseString(data.get("Content").getAsString()).getAsJsonObject();
+                message = content.get("Content").getAsString();
+                tips = content.get("Tips").getAsString();
+                picture = new Picture(
+                        content.get("ForwordBuf").getAsString(),
+                        content.get("ForwordField").getAsString()
+                );
+                break;
+            }
         }
+
     }
 
     @Override
@@ -106,5 +105,18 @@ public class FriendMessageEvent extends MessageEvent {
 
     public String getTips() {
         return tips;
+    }
+
+    @Override
+    public String toString() {
+        return "FriendMessageEvent{" +
+                "toUser=" + toUser +
+                ", messageSequence=" + messageSequence +
+                ", picture=" + picture +
+                ", tips='" + tips + '\'' +
+                ", senderID=" + senderID +
+                ", message='" + message + '\'' +
+                ", messageType=" + messageType +
+                '}';
     }
 }

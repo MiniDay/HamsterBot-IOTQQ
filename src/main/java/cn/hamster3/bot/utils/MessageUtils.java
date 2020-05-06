@@ -20,9 +20,8 @@ public class MessageUtils {
      *
      * @param text 要写的文字
      * @return 图片的base64编码
-     * @throws IOException 我觉得永远不可能抛出这个错误
      */
-    private static String getTextImage(String text) throws IOException {
+    public static String getTextImage(String text) {
         int width = 0;
         String[] area = text.split("\n");
         for (String s : area) {
@@ -43,10 +42,15 @@ public class MessageUtils {
         }
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        ImageIO.write(image, "PNG", outputStream);
-        String s = Base64.getEncoder().encodeToString(outputStream.toByteArray());
-        outputStream.close();
-        return s;
+        try {
+            ImageIO.write(image, "PNG", outputStream);
+            String s = Base64.getEncoder().encodeToString(outputStream.toByteArray());
+            outputStream.close();
+            return s;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "";
+        }
     }
 
     public static JsonObject sendTextToFriend(long qq, String message) {

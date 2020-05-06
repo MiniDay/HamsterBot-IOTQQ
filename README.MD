@@ -2,15 +2,13 @@
 一个基于[IOTQQ](https://github.com/IOTQQ/IOTQQ)的Java版本QQ机器人框架。
 
 # 这是什么？
-也许你曾经使用过酷Q，然后用过酷Q的HTTP插件，并使用了一些基于 酷Q HTTP协议插件 的 Java语言 Bot框架，来开发过自己的BOT。（这句话好绕啊...)  
-HamsterBot是另一个版本：并不需要酷Q，也更不需要酷Q的HTTP插件。  
-我们使用的是[IOTQQ](https://github.com/IOTQQ/IOTQQ)。
+一个使用Java语言编写的QQ机器人框架，你可以使用HamsterBot创造出自己的机器人。  
+使用代码监听群信息、好友信息，并作出相应的处理。
 
-如果看到这里还没能理解这个项目的意义，那么请关闭该页面，我觉得这个东西可能不适合你。
 
 # 为什么不使用酷Q？
 因为酷Q只能运行在windows环境，而且发图片等功能需要收费（酷Q Pro）。  
-我想要把我的Bot运行在树莓派上，因此我需要一个高效、跨平台的QQ机器人核心。  
+我想要把我的Bot运行在树莓派上，因此我需要一个高效、跨平台的QQ机器人。  
 [IOTQQ](https://github.com/IOTQQ/IOTQQ)满足了我的所有需求。
 
 # 我应该如何使用它？
@@ -71,7 +69,7 @@ public class Main {
 需要注意：
 1. 你的监听器类必须`implements cn.hamster3.bot.listener.Listener`  
 2. 事件处理器方法必须写上`@cn.hamster3.bot.listener.EventHandler`注解
-3. 方法的参数只允许有一个，且为`cn.hamster3.bot.event.Event`类本身或它的的子类。
+3. 方法的参数只允许有一个，且类型为`cn.hamster3.bot.event.Event`或它的的子类
 
 **以上三点任何一点未达成，都会导致方法不被调用。**
 
