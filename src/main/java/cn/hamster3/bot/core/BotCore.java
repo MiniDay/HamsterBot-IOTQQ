@@ -63,8 +63,14 @@ public class BotCore {
             System.out.println(Arrays.toString(args));
             callEvent(new FriendMessageEvent(this, JsonParser.parseString(args[0].toString()).getAsJsonObject()));
         });
-        socket.on("OnGroupMsgs", args -> callEvent(new GroupMessageEvent(this, JsonParser.parseString(args[0].toString()).getAsJsonObject())));
-        socket.on("OnEvents", args -> callEvent(new OtherEvent(this, JsonParser.parseString(args[0].toString()).getAsJsonObject())));
+        socket.on("OnGroupMsgs", args -> {
+            System.out.println(Arrays.toString(args));
+            callEvent(new GroupMessageEvent(this, JsonParser.parseString(args[0].toString()).getAsJsonObject()));
+        });
+        socket.on("OnEvents", args -> {
+            System.out.println(Arrays.toString(args));
+            callEvent(new OtherEvent(this, JsonParser.parseString(args[0].toString()).getAsJsonObject()));
+        });
     }
 
     public void start() {

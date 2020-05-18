@@ -66,7 +66,6 @@ public class GroupMessageEvent extends MessageEvent {
             case AtMsg: {
                 JsonObject content = JsonParser.parseString(data.get("Content").getAsString()).getAsJsonObject();
                 message = content.get("Content").getAsString();
-                tips = content.get("Tips").getAsString();
                 JsonArray userArray = content.getAsJsonArray("UserID");
                 atUsers = new long[userArray.size()];
                 for (int i = 0; i < userArray.size(); i++) {

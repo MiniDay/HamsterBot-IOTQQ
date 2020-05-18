@@ -23,7 +23,7 @@ public class ShutdownListener implements Listener {
             return;
         }
         logger.warning(String.format("用户 %d 执行关机命令.", event.getSender()));
-        event.replyIgnoreException("准备关闭HamsterBot!");
+        event.replyIgnoreException("已关闭HamsterBot!");
         System.exit(0);
     }
 }
